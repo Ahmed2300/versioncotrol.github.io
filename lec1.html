@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المحاضرة 1: Git والتحكم في الإصدارات | أحمد عزام</title>
+
+    <!-- Bootstrap CSS (RTL Version) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" integrity="sha384-nU14brUcp6StFntEOOEBvcJm4huWjB0OcIeQ3fltAfSmuZFrkAif0T+UtNGlKKQv" crossorigin="anonymous">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <!-- Google Fonts (Cairo) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --dark-color: #2c3e50;
+            --text-color: #34495e;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --code-bg: #282c34;
+            --code-text: #e0e0e0;
+            --border-color: #eef2f7;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            line-height: 1.9;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+        
+        .navbar {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            background: var(--card-bg) !important;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .lecture-header {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 7rem 0;
+            text-align: center;
+        }
+
+        .lecture-header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+        }
+        
+        .lecture-header .lead {
+            font-size: 1.5rem;
+            color: #bdc3c7;
+            margin-top: 1rem;
+        }
+
+        .lecture-section {
+            padding: 80px 0;
+        }
+
+        .lecture-section h2 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            color: var(--dark-color);
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 20px;
+            text-align: center;
+        }
+
+        .lecture-section h2::after {
+            content: '';
+            position: absolute;
+            right: 50%;
+            transform: translateX(50%);
+            bottom: 0;
+            width: 80px;
+            height: 4px;
+            background-color: var(--primary-color);
+            border-radius: 5px;
+        }
+        
+        .lecture-section h3 {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-top: 35px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .lecture-section h4 {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+        }
+        
+        .card-body {
+            padding: 2.5rem;
+        }
+
+        .cmd-container {
+            position: relative;
+            margin-bottom: 1.2rem;
+        }
+        
+        .cmd-block {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            font-family: 'SF Mono', 'Courier New', monospace;
+            padding: 20px 20px 20px 70px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            direction: ltr;
+            text-align: left;
+            font-size: 0.95rem;
+            border: 1px solid #444;
+        }
+
+        .cmd-block::before {
+            content: '$ ';
+            color: #98c379;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            background-color: #3a404a;
+            color: white;
+            border: 1px solid #555;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease, background-color 0.2s;
+            font-size: 0.9rem;
+        }
+        
+        .cmd-container:hover .copy-btn {
+            opacity: 1;
+        }
+        
+        .copy-btn:hover {
+             background-color: #4f5663;
+        }
+
+        .copy-btn.copied {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .icon {
+            margin-left: 15px;
+            color: var(--primary-color);
+        }
+        
+        #scrollToTopBtn {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 100;
+            border: none;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: background-color .3s, transform .3s;
+        }
+
+        #scrollToTopBtn:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+        }
+        
+        .term-en {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-weight: 700;
+            color: #555;
+            display: inline-block;
+            margin-right: 5px;
+            direction: ltr;
+        }
+        .command-explanation {
+            background-color: #eaf5ff;
+            border-right: 4px solid var(--primary-color);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .video-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        video {
+            width: 100%;
+            border-radius: 8px;
+            display: block;
+        }
+
+        /* Branching Diagram Styles */
+        .branch-diagram {
+            direction: ltr;
+            padding: 30px;
+            margin: 40px 0;
+            font-family: 'SF Mono', 'Courier New', monospace;
+            border: 1px solid var(--border-color);
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .branch-diagram-inner {
+            padding: 20px;
+            min-width: 700px;
+            position: relative;
+        }
+        .branch-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .branch-row {
+            display: flex;
+            align-items: center;
+            position: relative;
+            height: 50px;
+        }
+        .branch-label {
+            width: 140px;
+            text-align: right;
+            padding-right: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .branch-label.main {
+            color: var(--dark-color);
+        }
+        .branch-label.feature {
+            color: var(--primary-color);
+        }
+        .timeline {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+        .commit-node {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+            position: relative;
+            z-index: 3;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .commit-node.main {
+            background: linear-gradient(135deg, var(--dark-color), #34495e);
+        }
+        .commit-node.feature {
+            background: linear-gradient(135deg, var(--primary-color), #2980b9);
+        }
+        .commit-node.merge {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+        }
+        .commit-line {
+            height: 4px;
+            background-color: var(--dark-color);
+            position: relative;
+            z-index: 1;
+        }
+        .commit-line.feature {
+            background-color: var(--primary-color);
+        }
+        .commit-spacer {
+            width: 80px;
+        }
+        /* Branch connection lines */
+        .branch-connection {
+            position: absolute;
+            z-index: 2;
+        }
+        .branch-off {
+            width: 2px;
+            height: 35px;
+            background: linear-gradient(to bottom, var(--dark-color), var(--primary-color));
+            left: 305px; /* After C2 */
+            top: 25px;
+        }
+        .merge-back {
+            width: 2px;
+            height: 35px;
+            background: linear-gradient(to top, var(--primary-color), #8e44ad);
+            left: 545px; /* Before C5 */
+            top: -10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#"><i class="fas fa-code-branch me-2 text-primary"></i>Git & Version Control</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#recap-video">مراجعة سريعة</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#practical-journey">الرحلة العملية</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#lab-task">المهمة المعملية</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#command-reference">مرجع الأوامر</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="lecture-header">
+        <div class="container">
+            <h1 class="display-4"><i class="fas fa-book-open me-3"></i>المحاضرة الأولى: مقدمة إلى Git</h1>
+            <p class="lead">تلخيص وإعداد: أحمد عزام</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+    
+        <!-- Section for Recap Video -->
+        <section id="recap-video" class="lecture-section">
+            <h2><i class="fas fa-video icon"></i>مراجعة سريعة بالفيديو</h2>
+            <div class="video-container">
+                <div class="card">
+                    <div class="card-body p-2">
+                        <video controls preload="metadata">
+                            <source src="https://rr1---sn-oj5hn5-55.googlevideo.com/videoplayback?expire=1755900187&ei=-8yoaO3GHuakp-oP9ObmkQ0&ip=197.32.210.162&id=b356e465a607079e&itag=22&source=contrib_service_notebooklm&begin=0&requiressl=yes&xpc=EghoqJzIP3oBAQ==&sc=yes&susc=nblm&app=fife&ic=1045&eaua=fvyvl0CUuXg&pcm2=yes&mime=video/mp4&vprv=1&rqh=1&dur=370.056&lmt=1755891126713259&txp=0011224&sparams=expire,ei,ip,id,itag,source,requiressl,xpc,susc,app,ic,eaua,pcm2,mime,vprv,rqh,dur,lmt&sig=AJfQdSswRQIgB651jr4_yewUkQY75stujAEmZ-OQSMlcnOpq4nNv_P4CIQCri3nbhVz6DmA2v3LElLbmfvAsPEpybq4Z2EmgF48gxw==&cm2rm=sn-hgnls7e&rrc=80,40&fexp=24350590,24350737,24350827,24352258,24352262,24352568,24352574&req_id=c2645065d233a3ee&rms=ltu,su&redirect_counter=2&rm=sn-4g5eye7s&cms_redirect=yes&cmsv=e&met=1755892987,&mh=WE&mm=39&mn=sn-oj5hn5-55&ms=ltr&mt=1755892581&mv=m&mvi=1&pl=19&lsparams=met,mh,mm,mn,ms,mv,mvi,pl,rms,sc&lsig=APaTxxMwRAIgRwSQO9Sir0MNvE8yjHkTsHNhlp9F5p2GdDJcy3pGVwkCIHOrV-e1pczPJlVgU4ILdKvAuugdaZTMdP58j04vi6PJ" type="video/mp4">
+                            متصفحك لا يدعم عرض الفيديوهات.
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Section: Practical Journey -->
+        <section id="practical-journey" class="lecture-section">
+            <h2><i class="fas fa-rocket icon"></i>رحلة عملية: بناء مشروع متكامل بـ Git</h2>
+            <p class="text-center lead mb-5">سنطبق كل الأوامر الأساسية خطوة بخطوة من خلال بناء مشروع حقيقي.</p>
+
+            <div class="card">
+                <div class="card-body">
+                    <h3>المرحلة الأولى: الإعداد والتهيئة</h3>
+                    
+                    <h4>1. فحص تثبيت Git وطلب المساعدة</h4>
+                    <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git</code><br>
+                        <strong>الوظيفة:</strong> عند كتابته بمفرده، يعرض قائمة بالأوامر الأكثر شيوعًا. هذه أسرع طريقة للتأكد من أن Git مثبت ويعمل على جهازك.
+                    </div>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git</div>
+                    </div>
+                     <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git --help</code><br>
+                        <strong>الوظيفة:</strong> يفتح دليل المساعدة الشامل لـ Git في متصفحك، وهو مرجعك الأول عند الحاجة لمعلومات تفصيلية.
+                    </div>
+                     <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git --help</div>
+                    </div>
+
+                    <h4>2. إعداد معلومات المستخدم (Config)</h4>
+                    <p>هذه الخطوة ضرورية ويجب فعلها مرة واحدة فقط على جهازك. تحدد هويتك في كل commit تقوم به.</p>
+                     <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git config --global user.name "Your Name"</code><br>
+                        <strong>الوظيفة:</strong> يقوم بتعيين اسمك على المستوى العام (Global)، ليتم استخدامه في كل مستودعات Git على جهازك.
+                    </div>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git config --global user.name "Ahmed Azam"</div>
+                    </div>
+                    <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git config --global user.email "your.email@example.com"</code><br>
+                        <strong>الوظيفة:</strong> يقوم بتعيين بريدك الإلكتروني على المستوى العام.
+                    </div>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git config --global user.email "ahmed@example.com"</div>
+                    </div>
+                     <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git config --list</code><br>
+                        <strong>الوظيفة:</strong> يعرض جميع إعدادات Git (System, Global, Local) للتحقق من أن الإعدادات تم حفظها بنجاح.
+                    </div>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git config --list</div>
+                    </div>
+
+                    <h4>3. إنشاء المشروع وتهيئته</h4>
+                    <p>سنستخدم أوامر shell لإنشاء مجلد المشروع، ثم نهيئ Git بداخله.</p>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">cd Desktop</div>
+                    </div>
+                     <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">mkdir my-website</div>
+                    </div>
+                     <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">cd my-website</div>
+                    </div>
+                    <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git init</code><br>
+                        <strong>الوظيفة:</strong> يقوم بإنشاء مستودع Git فارغ في المجلد الحالي. ستلاحظ ظهور مجلد مخفي جديد باسم <code>.git</code>.
+                    </div>
+                     <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git init</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-5">
+                <div class="card-body">
+                    <h3>المرحلة الثانية: دورة العمل الأساسية</h3>
+                    
+                    <h4>1. إنشاء الملفات والتحقق من الحالة</h4>
+                     <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>touch &lt;file_name&gt;</code><br>
+                        <strong>الوظيفة:</strong> أمر shell لإنشاء ملف جديد فارغ. سننشئ ملفين.
+                    </div>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">touch index.html styles.css</div>
+                    </div>
+                    <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git status</code><br>
+                        <strong>الوظيفة:</strong> يعرض حالة المستودع. سيظهر الملفان الجديدان باللون الأحمر تحت قسم "Untracked files".
+                    </div>
+                     <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git status</div>
+                    </div>
+
+                    <h4>2. إضافة التغييرات إلى منطقة التجهيز (Staging)</h4>
+                    <p>يمكنك إضافة الملفات إلى منطقة التجهيز بعدة طرق. يمكنك إضافتها كل على حدة، أو تحديد عدة ملفات، أو إضافة كل التغييرات دفعة واحدة.</p>
+
+
+                    <h5>الطريقة الأولى: إضافة عدة ملفات محددة</h5>
+                    <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git add index.html styles.css</code><br>
+                        <strong>الوظيفة:</strong> يضيف الملفين المحددين إلى منطقة التجهيز.
+                    </div>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git add index.html styles.css</div>
+                    </div>
+                    <p>بعد تنفيذ الأمر، لنتحقق من الحالة مرة أخرى.</p>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git status</div>
+                    </div>
+                    <div class="command-explanation">
+                        <strong>النتيجة المتوقعة:</strong> ستلاحظ أن كلا الملفين أصبحا باللون الأخضر، مما يعني أنهما جاهزان للـ commit.
+                        <pre style="background-color: #f0f4f8; border: 1px solid #d6e0eb; padding: 15px; border-radius: 5px; direction: ltr; text-align: left; color: #2c3e50; white-space: pre-wrap; word-wrap: break-word;">On branch main
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        <span style="color: #28a745; font-weight: bold;">new file:   index.html</span>
+        <span style="color: #28a745; font-weight: bold;">new file:   styles.css</span>
+</pre>
+                    </div>
+
+                    <h5 class="mt-5">الطريقة الثانية: إضافة كل التغييرات دفعة واحدة</h5>
+                    <p>إذا كان لديك العديد من الملفات الجديدة أو المعدلة، فإن استخدام <code>git add .</code> هو الطريقة الأسرع لإضافتها جميعًا إلى منطقة التجهيز.</p>
+                    <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git add .</code><br>
+                        <strong>الوظيفة:</strong> يضيف كل التغييرات الجديدة والمعدلة في المجلد الحالي وتفرعاته إلى منطقة التجهيز.
+                    </div>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git add .</div>
+                    </div>
+                    
+                    <h4>3. حفظ التغييرات في المستودع (Commit)</h4>
+                    <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git commit -m "Commit message"</code><br>
+                        <strong>الوظيفة:</strong> يأخذ كل ما في منطقة التجهيز ويحفظه بشكل دائم في تاريخ المستودع مع رسالة وصفية.
+                    </div>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git commit -m "feat: Create initial project files"</div>
+                    </div>
+                    
+                    <h4>4. عرض التاريخ والفروقات</h4>
+                     <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git log</code><br>
+                        <strong>الوظيفة:</strong> يعرض تاريخ الـ commits بالتفصيل (الهاش، المؤلف، التاريخ، الرسالة).
+                    </div>
+                     <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git log</div>
+                    </div>
+                     <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git log --oneline</code><br>
+                        <strong>الوظيفة:</strong> يعرض التاريخ بشكل مختصر، كل commit في سطر واحد.
+                    </div>
+                     <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git log --oneline</div>
+                    </div>
+                    <p>الآن، لنقم بتعديل ملف `index.html` ونرى الفرق.</p>
+                     <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git diff</code><br>
+                        <strong>الوظيفة:</strong> يعرض الفروقات بين ملفات مجلد العمل (Working Directory) وآخر commit.
+                    </div>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git diff</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-5">
+                 <div class="card-body">
+                    <h3>المرحلة الثالثة: التفرع والدمج</h3>
+                    <p>التفرع (Branching) هو أحد أقوى المفاهيم في Git. يسمح لك بإنشاء خط تطوير مستقل ومنعزل عن الخط الرئيسي (master). يمكنك العمل على ميزة جديدة أو إصلاح خطأ دون التأثير على الكود المستقر. الدمج (Merging) هو عملية إعادة توحيد الفرع المنفصل مع الخط الرئيسي بعد اكتمال العمل.</p>
+
+                    <!-- Branching Visual Diagram -->
+                    <div class="text-center my-4">
+                        <img src="https://us1.discourse-cdn.com/inductiveautomation/original/3X/0/d/0d19837bbaf82a71ab35b2a62c5f8776af8e900a.png" 
+                             alt="Git Branching and Merging Diagram" 
+                             class="img-fluid rounded shadow" 
+                             style="max-width: 100%; height: auto; border: 1px solid var(--border-color);">
+                    </div>
+                    <h4>1. إنشاء الفروع والتنقل بينها</h4>
+                    <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git branch</code><br>
+                        <strong>الوظيفة:</strong> يعرض قائمة بكل الفروع المحلية. الفرع الحالي سيظهر بجانبه علامة (*).
+                    </div>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git branch</div>
+                    </div>
+                    <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git branch &lt;new_branch_name&gt;</code><br>
+                        <strong>الوظيفة:</strong> يقوم بإنشاء فرع جديد ولكنه لا ينتقل إليه.
+                    </div>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git branch feature/add-header</div>
+                    </div>
+                     <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git checkout &lt;existing_branch_name&gt;</code><br>
+                        <strong>الوظيفة:</strong> ينتقل إلى فرع موجود بالفعل.
+                    </div>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git checkout feature/add-header</div>
+                    </div>
+                    <p>هناك طريقة مختصرة لإنشاء فرع والانتقال إليه في خطوة واحدة:</p>
+                    <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git checkout -b &lt;new_branch_name&gt;</code><br>
+                        <strong>الوظيفة:</strong> يقوم بإنشاء فرع جديد وينتقل إليه فورًا.
+                    </div>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git checkout -b fix/css-bug</div>
+                    </div>
+
+                    <h4>2. الدمج (Merge)</h4>
+                    <p>بعد الانتهاء من العمل على فرع `feature/add-header`، نريد دمج تغييراته في الفرع الرئيسي `main`.</p>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git checkout main</div>
+                    </div>
+                    <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git merge &lt;branch_to_merge&gt;</code><br>
+                        <strong>الوظيفة:</strong> يقوم بدمج التغييرات من الفرع المحدد في الفرع الحالي الذي تقف عليه.
+                    </div>
+                     <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                        <div class="cmd-block">git merge feature/add-header</div>
+                    </div>
+                    <p>لنرَ كيف يبدو التاريخ الآن مع عملية الدمج:</p>
+                     <div class="command-explanation">
+                        <strong>الأمر:</strong> <code>git log --oneline --graph</code><br>
+                        <strong>الوظيفة:</strong> يعرض التاريخ بشكل مختصر مع رسم بياني يوضح مسارات الفروع وعمليات الدمج.
+                    </div>
+                    <div class="cmd-container">
+                        <button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- Section: Lab Task -->
+        <section id="lab-task" class="lecture-section bg-light">
+            <div class="container">
+                <h2><i class="fas fa-flask icon"></i>المهمة المعملية 1: مستودعك الأول</h2>
+                <div class="alert alert-success mt-4">
+                    <h5 class="alert-heading"><i class="fas fa-check-circle"></i> اكتملت المهمة!</h5>
+                    <p>هذا القسم يشرح بالتفصيل كيفية إنجاز المهمة المطلوبة في الإصدار السابق من المحاضرة.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Command Reference -->
+        <section id="command-reference" class="lecture-section">
+            <h2><i class="fas fa-book icon"></i>مرجع الأوامر السريع</h2>
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>الأمر</th>
+                                <th>الوظيفة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>git init</code></td><td>إنشاء مستودع جديد.</td></tr>
+                            <tr><td><code>git status</code></td><td>عرض حالة المستودع.</td></tr>
+                            <tr><td><code>git config</code></td><td>إعداد متغيرات Git.</td></tr>
+                            <tr><td><code>git add</code></td><td>إضافة تغييرات لمنطقة التجهيز.</td></tr>
+                            <tr><td><code>git commit</code></td><td>حفظ التغييرات في التاريخ.</td></tr>
+                            <tr><td><code>git log</code></td><td>عرض تاريخ الـ commits.</td></tr>
+                            <tr><td><code>git diff</code></td><td>عرض الفروقات بين التغييرات.</td></tr>
+                            <tr><td><code>git branch</code></td><td>إدارة الفروع (إنشاء، عرض).</td></tr>
+                            <tr><td><code>git checkout</code></td><td>التنقل بين الفروع أو الـ commits.</td></tr>
+                            <tr><td><code>git merge</code></td><td>دمج فرع في الفرع الحالي.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center p-4 mt-5">
+        <div class="container">
+            <p>&copy; 2025 محاضرة Git والتحكم في الإصدارات. تلخيص وإعداد: أحمد عزام</p>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button onclick="scrollToTop()" id="scrollToTopBtn" title="العودة للأعلى"><i class="fas fa-arrow-up"></i></button>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('click', function(event) {
+            if (event.target.matches('.copy-btn') || event.target.closest('.copy-btn')) {
+                const button = event.target.closest('.copy-btn');
+                const container = button.closest('.cmd-container');
+                const codeBlock = container.querySelector('.cmd-block');
+                const commandText = codeBlock.innerText.replace('$ ', '').trim();
+
+                navigator.clipboard.writeText(commandText).then(() => {
+                    const originalContent = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check"></i> تم النسخ!';
+                    button.classList.add('copied');
+
+                    setTimeout(() => {
+                        button.innerHTML = originalContent;
+                        button.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            }
+        });
+        
+        const scrollToTopBtn = document.getElementById("scrollToTopBtn");
+        window.onscroll = function() {
+            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                scrollToTopBtn.style.display = "block";
+            } else {
+                scrollToTopBtn.style.display = "none";
+            }
+        };
+        function scrollToTop() {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+         document.querySelectorAll('a.nav-link').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
