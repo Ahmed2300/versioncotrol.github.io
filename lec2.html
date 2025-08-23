@@ -476,15 +476,82 @@ git pull &lt;remote&gt; &lt;branch&gt;
             </div>
             <div class="card">
                 <div class="card-body">
-                    <h3>أدوات مساعدة لسير العمل</h3>
+                    <h3><span class="term-en">git stash</span>: الحافظة المؤقتة للمطورين</h3>
+                    <p>أداة قوية لحفظ التغييرات غير المكتملة مؤقتًا، مما يتيح لك التبديل بين المهام دون فقدان عملك.</p>
+                    
+                    <h4>متى تحتاج <span class="term-en">git stash</span>؟</h4>
+                    <div class="alert alert-info">
+                        <strong>السيناريو الشائع:</strong> أنت تعمل على ميزة جديدة، لكن زميلك يطلب منك إصلاح خطأ عاجل في فرع آخر. تغييراتك الحالية غير جاهزة للـ commit، لكنك لا تريد فقدانها.
+                    </div>
+                    
+                    <h4>الأوامر الأساسية:</h4>
+                    <p><strong>حفظ التغييرات الحالية:</strong></p>
+                    <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git stash</div></div>
+                    <p>أو مع رسالة وصفية:</p>
+                    <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git stash save "Working on user authentication"</div></div>
+                    
+                    <p><strong>عرض قائمة المحفوظات:</strong></p>
+                    <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git stash list</div></div>
+                    <p>يعرض قائمة مثل:</p>
+                    <div class="bg-dark text-light p-2 rounded mt-2" style="font-family: monospace; font-size: 0.85rem;">
+stash@{0}: On main: Working on user authentication<br>
+stash@{1}: WIP on main: 1a2b3c4 Add login form
+                    </div>
+                    
+                    <p><strong>استرجاع آخر محفوظة:</strong></p>
+                    <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git stash pop</div></div>
+                    <p>يطبق التغييرات ويحذف المحفوظة من القائمة.</p>
+                    
+                    <p><strong>تطبيق محفوظة دون حذفها:</strong></p>
+                    <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git stash apply</div></div>
+                    <p>أو تطبيق محفوظة معينة:</p>
+                    <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git stash apply stash@{1}</div></div>
+                    
+                    <p><strong>عرض محتوى محفوظة:</strong></p>
+                    <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git stash show</div></div>
+                    <p>أو لعرض تفصيلي:</p>
+                    <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git stash show -p</div></div>
+                    
+                    <p><strong>حذف محفوظة معينة:</strong></p>
+                    <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git stash drop stash@{0}</div></div>
+                    
+                    <p><strong>حذف جميع المحفوظات:</strong></p>
+                    <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git stash clear</div></div>
+                    
+                    <h4>مثال عملي كامل:</h4>
+                    <div class="alert alert-success">
+                        <h5>سير العمل:</h5>
+                        <ol>
+                            <li>تعمل على ميزة جديدة وتعدل ملفات</li>
+                            <li><code>git stash save "Half-done feature X"</code> - حفظ العمل</li>
+                            <li><code>git switch hotfix-branch</code> - التبديل لإصلاح عاجل</li>
+                            <li>إصلاح الخطأ وعمل commit</li>
+                            <li><code>git switch main</code> - العودة للفرع الأصلي</li>
+                            <li><code>git stash pop</code> - استرجاع عملك السابق</li>
+                            <li>متابعة العمل على الميزة</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <strong><i class="fas fa-info-circle"></i> ملاحظات مهمة:</strong>
+                        <ul class="mb-0">
+                            <li><code>git stash</code> يحفظ فقط الملفات المتتبعة (tracked files)</li>
+                            <li>الملفات الجديدة غير المضافة لن تُحفظ إلا إذا استخدمت <code>git stash -u</code></li>
+                            <li>استخدم <code>git stash pop</code> للاستخدام العادي</li>
+                            <li>استخدم <code>git stash apply</code> إذا كنت تريد تطبيق نفس التغييرات في أماكن متعددة</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h3>أدوات مساعدة أخرى لسير العمل</h3>
                     <ul>
                         <li><strong><code>git commit --amend</code>:</strong> لتعديل آخر commit قمت به (إضافة تغييرات أو تغيير الرسالة) قبل عمل `push`.</li>
                         <li><strong><code>git cherry-pick</code>:</strong> لأخذ commit معين من فرع وتطبيقه على فرع آخر. مفيد لنقل إصلاح صغير دون دمج الفرع بأكمله.</li>
-                        <li><strong><code>git stash</code>:</strong> لحفظ التغييرات غير المكتملة بشكل مؤقت للتبديل بين المهام بسرعة.</li>
                     </ul>
                 </div>
             </div>
-        </section>
 
         <!-- Command Reference Section -->
         <section class="lecture-section">
