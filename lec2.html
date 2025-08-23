@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المحاضرة 2: Git للفرق | أحمد عزام</title>
+
+    <!-- Bootstrap CSS (RTL Version) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" integrity="sha384-nU14brUcp6StFntEOOEBvcJm4huWjB0OcIeQ3fltAfSmuZFrkAif0T+UtNGlKKQv" crossorigin="anonymous">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <!-- Google Fonts (Cairo) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #27ae60;
+            --dark-color: #2c3e50;
+            --text-color: #34495e;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --code-bg: #282c34;
+            --code-text: #e0e0e0;
+            --border-color: #eef2f7;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            line-height: 1.9;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+        
+        .navbar {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            background: var(--card-bg) !important;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .lecture-header {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 7rem 0;
+            text-align: center;
+        }
+
+        .lecture-header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+        }
+        
+        .lecture-header .lead {
+            font-size: 1.5rem;
+            color: #bdc3c7;
+            margin-top: 1rem;
+        }
+
+        .lecture-section {
+            padding: 80px 0;
+        }
+
+        .lecture-section h2 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            color: var(--dark-color);
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 20px;
+            text-align: center;
+        }
+
+        .lecture-section h2::after {
+            content: '';
+            position: absolute;
+            right: 50%;
+            transform: translateX(50%);
+            bottom: 0;
+            width: 80px;
+            height: 4px;
+            background-color: var(--primary-color);
+            border-radius: 5px;
+        }
+        
+        .lecture-section h3 {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-top: 35px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+        }
+        
+        .card-body { padding: 2.5rem; }
+        .cmd-block { background-color: var(--code-bg); color: var(--code-text); font-family: 'SF Mono', 'Courier New', monospace; padding: 20px 20px 20px 70px; border-radius: 8px; white-space: pre-wrap; word-wrap: break-word; direction: ltr; text-align: left; font-size: 0.95rem; border: 1px solid #444; }
+        .cmd-block::before { content: '$ '; color: #98c379; }
+        .cmd-container { position: relative; margin-bottom: 1.2rem; }
+        .copy-btn { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); background-color: #3a404a; color: white; border: 1px solid #555; padding: 5px 10px; border-radius: 5px; cursor: pointer; opacity: 0; transition: opacity 0.3s ease, background-color 0.2s; font-size: 0.9rem; }
+        .cmd-container:hover .copy-btn { opacity: 1; }
+        .copy-btn.copied { background-color: #28a745; border-color: #28a745; }
+        .icon { margin-left: 15px; color: var(--primary-color); }
+        .term-en { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 700; color: #555; display: inline-block; margin-right: 5px; direction: ltr; }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#"><i class="fas fa-code-branch me-2 text-primary"></i>Git & Version Control</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#concepts">المفاهيم</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#practical-journey">الرحلة العملية</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#advanced-tools">أدوات متقدمة</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#quiz-section">اختبار ومراجع</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="lecture-header">
+        <div class="container">
+            <h1 class="display-4"><i class="fas fa-users me-3"></i>المحاضرة الثانية: Git للعمل الجماعي</h1>
+            <p class="lead">تلخيص وإعداد: أحمد عزام</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+    
+        <!-- Important Notice -->
+        <section class="lecture-section pt-4">
+            <div class="alert alert-primary border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="row align-items-center">
+                    <div class="col-md-2 text-center">
+                        <i class="fas fa-keyboard fa-3x mb-2"></i>
+                    </div>
+                    <div class="col-md-10">
+                        <h4 class="alert-heading mb-3"><i class="fas fa-exclamation-circle me-2"></i>تنبيه مهم: التعلم بالممارسة</h4>
+                        <p class="mb-2 fs-5"><strong>لا تكتفِ بالقراءة فقط!</strong></p>
+                        <p class="mb-3">هذه المحاضرة مصممة للتطبيق العملي. افتح Terminal أو Command Prompt واكتب كل أمر بيديك. التعلم الحقيقي يحدث عندما تمارس الأوامر بنفسك وترى النتائج مباشرة.</p>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-lightbulb me-2 text-warning"></i>
+                            <span><strong>نصيحة:</strong> جرب الأوامر، اكسر الأشياء، وتعلم من الأخطاء - هذه هي أفضل طريقة لإتقان Git!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Section -->
+        <section class="lecture-section bg-light">
+            <div class="container">
+                <h2><i class="fas fa-play-circle icon"></i>شرح مرئي للمحاضرة</h2>
+                <div class="card">
+                    <div class="card-body p-0">
+                        <video controls preload="metadata" style="width: 100%; height: auto; display: block;">
+                            <source src="Vid2.mp4" type="video/mp4">
+                            متصفحك لا يدعم عرض الفيديوهات.
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </section>
+    
+        <!-- Section I: Concepts -->
+        <section id="concepts" class="lecture-section">
+            <h2><i class="fas fa-server icon"></i>I. أساسيات العمل الجماعي: المستودعات البعيدة (Remotes)</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h3>ما هو الـ <span class="term-en">Remote</span>؟</h3>
+                    <p>الـ <span class="term-en">Remote</span> هو نسخة من مستودعك مستضافة على خادم (مثل GitHub أو GitLab). يسمح هذا لعدة مطورين بالعمل على نفس المشروع ومزامنة تغييراتهم. الاسم الافتراضي لأول <span class="term-en">remote</span> هو <span class="term-en">origin</span>.</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h3><span class="term-en">git clone</span> مقابل <span class="term-en">git init</span></h3>
+                    <ul>
+                        <li><strong><span class="term-en">git clone</span>:</strong> تستخدمه عندما يكون المشروع موجودًا بالفعل على خادم بعيد، وتريد إنشاء نسخة محلية منه على جهازك.</li>
+                        <li><strong><span class="term-en">git init</span>:</strong> تستخدمه عندما تبدأ مشروعًا جديدًا من الصفر على جهازك المحلي.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h3>المزامنة: <span class="term-en">Push</span>, <span class="term-en">Pull</span>, & <span class="term-en">Fetch</span></h3>
+                    <ul>
+                        <li><strong><span class="term-en">git push</span>:</strong> يرفع (<span class="term-en">upload</span>) تغييراتك المحلية إلى الـ remote.</li>
+                        <li><strong><span class="term-en">git pull</span>:</strong> يسحب (<span class="term-en">download</span>) التغييرات من الـ remote ويدمجها فورًا.</li>
+                        <li><strong><span class="term-en">git fetch</span>:</strong> يسحب التغييرات من الـ remote لكن **لا** يدمجها، مما يسمح لك بمراجعتها أولاً.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section II: Practical Journey -->
+        <section id="practical-journey" class="lecture-section bg-light">
+            <div class="container">
+                <h2><i class="fas fa-rocket icon"></i>II. رحلة عملية: من المحلي إلى العالمي</h2>
+                <p class="text-center lead mb-5">سنقوم بمحاكاة سير عمل كامل، من إنشاء مشروع محلي إلى رفعه والتعاون عليه.</p>
+                <div class="card">
+                    <div class="card-body">
+                        <h3>الخطوة 0: الإعداد المسبق على GitHub</h3>
+                        <div class="alert alert-warning">
+                            <h5 class="alert-heading"><i class="fab fa-github"></i> مطلوب قبل البدء</h5>
+                            <p>اذهب إلى حسابك في GitHub وأنشئ مستودعًا جديدًا وفارغًا (New Repository). **لا تقم بإضافة ملف README أو .gitignore من GitHub**. كل ما تحتاجه هو رابط الـ HTTPS الخاص بالمستودع، والذي سيبدو هكذا: <code>https://github.com/YourUsername/ProjectName.git</code></p>
+                        </div>
+
+                        <h3>الخطوة 1: إنشاء المشروع المحلي</h3>
+                        <p><strong>إنشاء مجلد المشروع والانتقال إليه:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">mkdir my-remote-project && cd my-remote-project</div></div>
+                        <p><code>mkdir</code> ينشئ مجلدًا جديدًا، و <code>cd</code> ينتقل إليه. الرمز <code>&&</code> يعني "نفذ الأمر الثاني فقط إذا نجح الأول".</p>
+                        
+                        <p><strong>تهيئة مستودع Git محلي:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git init</div></div>
+                        <p>ينشئ مستودع Git فارغ في المجلد الحالي. ستلاحظ ظهور مجلد مخفي <code>.git</code> يحتوي على كل بيانات Git.</p>
+                        
+                        <p><strong>فحص المستودعات البعيدة (قبل الربط):</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git remote -v</div></div>
+                        <p>يعرض قائمة بجميع المستودعات البعيدة المرتبطة بمشروعك. الآن ستكون القائمة فارغة لأننا لم نربط أي remote بعد. الخيار <code>-v</code> يعني "verbose" لإظهار التفاصيل الكاملة.</p>
+                        
+                        <p><strong>إنشاء ملف README وإضافة محتوى:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">echo "# My Awesome Project" > README.md</div></div>
+                        <p><code>echo</code> يطبع النص، والرمز <code>></code> يوجه الإخراج إلى ملف جديد (أو يستبدل محتوى ملف موجود).</p>
+                        
+                        <p><strong>إضافة الملف إلى منطقة التجهيز:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git add README.md</div></div>
+                        <p>يضع الملف في منطقة التجهيز (Staging Area) ليصبح جاهزًا للـ commit.</p>
+                        
+                        <p><strong>إنشاء أول commit:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git commit -m "Initial commit"</div></div>
+                        <p>يحفظ التغييرات بشكل دائم في تاريخ المستودع مع رسالة وصفية. الخيار <code>-m</code> يسمح بكتابة الرسالة مباشرة في سطر الأوامر.</p>
+
+                        <h3>الخطوة 2: ربط المحلي بالبعيد والدفع الأول</h3>
+                        <p><strong>ربط المستودع المحلي بالمستودع البعيد:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git remote add origin https://github.com/YourUsername/ProjectName.git</div></div>
+                        <p>يضيف مستودعًا بعيدًا جديدًا باسم `origin` ويربطه بالرابط المحدد. `origin` هو الاسم التقليدي للمستودع البعيد الرئيسي.</p>
+                        
+                        <p><strong>فحص المستودعات البعيدة (بعد الربط):</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git remote -v</div></div>
+                        <p>الآن ستظهر لك معلومات الـ remote المرتبط، مع عرض رابطين: أحدهما للـ `fetch` (السحب) والآخر للـ `push` (الرفع).</p>
+                        
+                        <p><strong>رفع الفرع المحلي إلى المستودع البعيد:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git push -u origin main</div></div>
+                        <p>يرفع فرع `main` المحلي إلى الـ remote المسمى `origin`. الخيار `-u` (أو `--set-upstream`) يربط بين فرعك المحلي والفرع البعيد، لذا في المرات القادمة يمكنك فقط كتابة `git push` دون تحديد الـ remote والفرع.</p>
+                        <p class="text-success fw-bold">ممتاز! اذهب الآن إلى صفحة مستودعك على GitHub، ستجد ملف README.md قد ظهر هناك.</p>
+
+                        <h3>الخطوة 3: محاكاة عمل زميل (استخدام <span class="term-en">Pull</span>)</h3>
+                        <p>لنفترض أن زميلك في الفريق أضاف تعديلاً. سنحاكي ذلك عن طريق تعديل الملف مباشرة من واجهة GitHub.</p>
+                        <ol>
+                            <li>اذهب إلى مستودعك على GitHub.</li>
+                            <li>افتح ملف `README.md` واضغط على أيقونة القلم (Edit).</li>
+                            <li>أضف سطرًا جديدًا، ثم انزل للأسفل واضغط "Commit changes".</li>
+                        </ol>
+                        <p><strong>سحب التغييرات من المستودع البعيد:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git pull</div></div>
+                        <p>يقوم بسحب آخر التغييرات من الـ remote ودمجها تلقائيًا في فرعك المحلي الحالي. هذا الأمر يجمع بين `git fetch` و `git merge`.</p>
+                        <p>يمكنك استخدام `cat README.md` للتأكد من وجود السطر الجديد الذي أضافه "زميلك".</p>
+
+                        <div class="alert alert-warning mt-3">
+                            <h5 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> مشكلة محتملة: خطأ في التتبع</h5>
+                            <p><strong>إذا ظهرت لك رسالة خطأ مثل:</strong></p>
+                            <div class="bg-dark text-light p-3 rounded mb-3" style="font-family: monospace; font-size: 0.85rem;">
+There is no tracking information for the current branch.<br>
+Please specify which branch you want to merge with.<br>
+git pull &lt;remote&gt; &lt;branch&gt;
+                            </div>
+                            <p><strong>السبب:</strong> فرعك المحلي غير مرتبط بفرع بعيد (لم تستخدم `-u` في أول `push`).</p>
+                            <p><strong>الحلول:</strong></p>
+                            <ul>
+                                <li><strong>الحل السريع:</strong> حدد الـ remote والفرع يدويًا:
+                                    <div class="cmd-container mt-2"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git pull origin main</div></div>
+                                </li>
+                                <li><strong>الحل الدائم:</strong> اربط فرعك المحلي بالفرع البعيد:
+                                    <div class="cmd-container mt-2"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git branch --set-upstream-to=origin/main master</div></div>
+                                    <small class="text-muted">ملاحظة: غيّر `master` إلى `main` إذا كان فرعك المحلي يسمى `main`</small>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <h3>الخطوة 4: سير عمل الفروع (<span class="term-en">Feature Branch Workflow</span>)</h3>
+                        <p><strong>إنشاء فرع جديد للميزة والانتقال إليه:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git switch -c feature/add-contact-page</div></div>
+                        <p>`git switch` هو الأمر الحديث للتنقل بين الفروع. الخيار `-c` ينشئ فرعًا جديدًا وينتقل إليه فورًا. هذا مكافئ لـ `git checkout -b`.</p>
+                        
+                        <p><strong>إنشاء ملف جديد للميزة:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">echo "&lt;h1&gt;Contact Us&lt;/h1&gt;" > contact.html</div></div>
+                        <p>ينشئ ملف HTML جديد يحتوي على عنوان بسيط. هذا يمثل الميزة الجديدة التي نعمل عليها.</p>
+                        
+                        <p><strong>إضافة الملف الجديد إلى منطقة التجهيز:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git add contact.html</div></div>
+                        <p>يضيف الملف الجديد إلى منطقة التجهيز ليصبح جاهزًا للـ commit.</p>
+                        
+                        <p><strong>حفظ التغييرات في commit:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git commit -m "feat: Add contact page"</div></div>
+                        <p>يحفظ التغييرات مع رسالة وصفية تتبع نمط "Conventional Commits" حيث `feat:` يشير إلى ميزة جديدة.</p>
+                        
+                        <h3>الخطوة 5: دمج الميزة ورفع النتيجة النهائية</h3>
+                        <p><strong>العودة إلى الفرع الرئيسي:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git switch main</div></div>
+                        <p>ينتقل من فرع الميزة إلى الفرع الرئيسي `main` للاستعداد لعملية الدمج.</p>
+                        
+                        <p><strong>دمج فرع الميزة في الفرع الرئيسي:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git merge feature/add-contact-page</div></div>
+                        <p>يدمج جميع التغييرات من فرع الميزة إلى الفرع الحالي (`main`). سينشئ Git commit دمج جديد إذا لزم الأمر.</p>
+                        
+                        <p><strong>رفع التغييرات إلى المستودع البعيد:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git push</div></div>
+                        <p>يرفع الفرع الرئيسي المحدث إلى الـ remote. لا نحتاج لتحديد الـ remote والفرع لأننا استخدمنا `-u` في المرة الأولى.</p>
+                        
+                        <p><strong>عرض تاريخ المشروع بصريًا:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git log --oneline --graph --all</div></div>
+                        <p>يعرض تاريخ جميع الفروع بشكل مختصر مع رسم بياني يوضح التفرع والدمج. `--oneline` يختصر كل commit لسطر واحد، `--graph` يرسم الخطوط، `--all` يعرض جميع الفروع.</p>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h3><i class="fab fa-github me-2"></i>مهمة متقدمة: إنشاء Pull Request كامل</h3>
+                        <p class="lead">سنتعلم كيفية دمج فرعين يحتويان على commits مختلفة وإنشاء Pull Request على GitHub.</p>
+                        
+                        <h4>الجزء الأول: إعداد المشروع (محلي وبعيد)</h4>
+                        <p><strong>إنشاء مشروع جديد من الصفر:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">mkdir my-git-project && cd my-git-project</div></div>
+                        
+                        <p><strong>تهيئة مستودع Git مع فرع main:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git init -b main</div></div>
+                        <p>الخيار `-b main` ينشئ الفرع الرئيسي باسم `main` مباشرة (المعيار الحديث).</p>
+                        
+                        <p><strong>إنشاء أول ملف وcommit:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">echo "# My Awesome Project" > README.md</div></div>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git add README.md</div></div>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git commit -m "Initial commit"</div></div>
+                        
+                        <div class="alert alert-info">
+                            <h5><i class="fab fa-github"></i> إنشاء مستودع على GitHub</h5>
+                            <ol>
+                                <li>اذهب إلى github.com وسجل الدخول</li>
+                                <li>اضغط على "+" في الأعلى واختر "New repository"</li>
+                                <li>اكتب اسم المستودع (مثل: my-git-project)</li>
+                                <li><strong>مهم:</strong> اتركه فارغًا - لا تضع README أو .gitignore</li>
+                                <li>اضغط "Create repository"</li>
+                            </ol>
+                        </div>
+                        
+                        <p><strong>ربط المستودع المحلي بـ GitHub:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git remote add origin https://github.com/YourUsername/my-git-project.git</div></div>
+                        <p>استبدل الرابط برابط مستودعك الفعلي من GitHub.</p>
+                        
+                        <p><strong>رفع أول commit:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git push -u origin main</div></div>
+                        
+                        <h4>الجزء الثاني: إنشاء فرع الميزة الجديدة</h4>
+                        <p><strong>إنشاء والانتقال إلى فرع جديد:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git checkout -b add-user-feature</div></div>
+                        
+                        <p><strong>إضافة تغييرات في الفرع الجديد:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">echo "User profile page." > user.html</div></div>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git add user.html</div></div>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git commit -m "Feat: Create user profile page"</div></div>
+                        <p>الآن فرع `add-user-feature` يحتوي على commit جديد لا يوجد في `main`.</p>
+                        
+                        <h4>الجزء الثالث: إنشاء ودمج Pull Request</h4>
+                        <p><strong>رفع فرع الميزة إلى GitHub:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git push origin add-user-feature</div></div>
+                        
+                        <div class="alert alert-success">
+                            <h5><i class="fab fa-github"></i> إنشاء Pull Request على GitHub</h5>
+                            <ol>
+                                <li>اذهب إلى مستودعك على GitHub</li>
+                                <li>ستظهر رسالة صفراء مع زر "Compare & pull request" - اضغط عليه</li>
+                                <li><strong>العنوان:</strong> "Add User Profile Feature"</li>
+                                <li><strong>الوصف:</strong> اشرح التغييرات التي قمت بها</li>
+                                <li>تأكد أن Base branch هو `main` والـ Compare branch هو `add-user-feature`</li>
+                                <li>اضغط "Create pull request"</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <h5><i class="fas fa-code-branch"></i> دمج Pull Request</h5>
+                            <ol>
+                                <li>اضغط على الزر الأخضر "Merge pull request"</li>
+                                <li>اضغط "Confirm merge"</li>
+                                <li><strong>مستحسن:</strong> احذف الفرع البعيد بالضغط على "Delete branch"</li>
+                            </ol>
+                            <p class="mb-0">تهانينا! الكود من `add-user-feature` أصبح الآن جزءًا من `main` على GitHub.</p>
+                        </div>
+                        
+                        <h4>الجزء الرابع: مزامنة وتنظيف المستودع المحلي</h4>
+                        <p><strong>العودة إلى الفرع الرئيسي محليًا:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git checkout main</div></div>
+                        
+                        <p><strong>سحب آخر التغييرات من GitHub:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git pull origin main</div></div>
+                        <p>هذا سيحمل merge commit الذي تم إنشاؤه على GitHub ويحديث فرعك المحلي.</p>
+                        
+                        <p><strong>حذف الفرع المحلي المكتمل:</strong></p>
+                        <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git branch -d add-user-feature</div></div>
+                        <p>بما أن العمل اكتمل ودُمج، لم نعد نحتاج هذا الفرع محليًا.</p>
+                        
+                        <div class="alert alert-success">
+                            <h5><i class="fas fa-check-circle"></i> تم إكمال سير العمل!</h5>
+                            <p class="mb-0">أنت الآن على فرع `main` نظيف ومحدث، وقد أكملت دورة كاملة من إنشاء ميزة ودمجها عبر Pull Request.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section III: Advanced Tools -->
+        <section id="advanced-tools" class="lecture-section">
+            <h2><i class="fas fa-tools icon"></i>III. أدوات متقدمة لتعديل التاريخ وسير العمل</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h3><span class="term-en">git reset</span> مقابل <span class="term-en">git revert</span> (للتراجع عن الأخطاء)</h3>
+                     <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i><strong>قاعدة ذهبية:</strong> لا تستخدم `git reset` أبدًا على الـ commits التي تم رفعها إلى فرع مشترك.</div>
+                    <ul>
+                        <li><strong><code>git reset</code>:</strong> يحذف الـ commits من التاريخ. استخدمه فقط محليًا لتصحيح أخطائك قبل عمل `push`.</li>
+                        <li><strong><code>git revert</code>:</strong> ينشئ commit جديدًا يلغي تغييرات commit سابق. هذه هي الطريقة الآمنة والصحيحة للتراجع عن الأخطاء في الفروع المشتركة لأنها تحافظ على التاريخ.</li>
+                    </ul>
+                </div>
+            </div>
+             <div class="card">
+                <div class="card-body">
+                    <h3>العودة إلى commit معين باستخدام الـ Hash</h3>
+                    <p>أحيانًا تحتاج للعودة إلى نقطة معينة في تاريخ مشروعك. إليك الطرق المختلفة:</p>
+                    
+                    <h4>1. عرض تاريخ المشروع والحصول على الـ Hash</h4>
+                    <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git log --oneline</div></div>
+                    <p>يعرض قائمة مختصرة بجميع الـ commits مع الـ hash المختصر لكل منها (أول 7 أحرف).</p>
+                    
+                    <h4>2. العودة المؤقتة لمراجعة commit قديم</h4>
+                    <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git checkout a1b2c3d</div></div>
+                    <p>يضعك في حالة <span class="term-en">Detached HEAD</span> لمراجعة الكود في هذه النقطة دون تعديل التاريخ. استبدل `a1b2c3d` بالـ hash الفعلي.</p>
+                    
+                    <div class="alert alert-info">
+                        <strong>للعودة إلى الفرع الحالي:</strong>
+                        <div class="cmd-container mt-2"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git switch main</div></div>
+                    </div>
+                    
+                    <h4>3. إلغاء commit معين (الطريقة الآمنة)</h4>
+                    <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git revert a1b2c3d</div></div>
+                    <p>ينشئ commit جديد يلغي تغييرات الـ commit المحدد. هذه هي الطريقة المفضلة في المشاريع المشتركة.</p>
+                    
+                    <h4>4. العودة الصعبة (خطير - للاستخدام المحلي فقط)</h4>
+                    <div class="alert alert-danger">
+                        <strong><i class="fas fa-exclamation-triangle"></i> تحذير:</strong> هذا الأمر يحذف جميع الـ commits بعد النقطة المحددة. لا تستخدمه إذا كنت قد رفعت التغييرات إلى remote مشترك.
+                    </div>
+                    <div class="cmd-container"><button class="copy-btn" title="Copy"><i class="far fa-copy"></i> نسخ</button><div class="cmd-block">git reset --hard a1b2c3d</div></div>
+                    <p>يعيد المشروع إلى الحالة الموجودة في الـ commit المحدد ويحذف كل شيء بعده نهائيًا.</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h3>أدوات مساعدة لسير العمل</h3>
+                    <ul>
+                        <li><strong><code>git commit --amend</code>:</strong> لتعديل آخر commit قمت به (إضافة تغييرات أو تغيير الرسالة) قبل عمل `push`.</li>
+                        <li><strong><code>git cherry-pick</code>:</strong> لأخذ commit معين من فرع وتطبيقه على فرع آخر. مفيد لنقل إصلاح صغير دون دمج الفرع بأكمله.</li>
+                        <li><strong><code>git stash</code>:</strong> لحفظ التغييرات غير المكتملة بشكل مؤقت للتبديل بين المهام بسرعة.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Command Reference Section -->
+        <section class="lecture-section">
+            <div class="container">
+                <h2><i class="fas fa-terminal icon"></i>دليل الأوامر الشامل</h2>
+                <p class="lead text-center mb-5">شرح مبسط لجميع أوامر Git الأساسية والمتقدمة</p>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git checkout</code></h4>
+                                <p>يستخدم للتنقل بين أجزاء المستودع، بما في ذلك الانتقال إلى commit معين حتى لو لم يكن هناك فرع يشير إليه.</p>
+                                <ul>
+                                    <li>عند الانتقال لـ commit معين: يضعك في حالة "رأس منفصل" (detached head)</li>
+                                    <li>أي تغييرات ستفقد إلا إذا أنشأت فرعًا جديدًا</li>
+                                    <li>يمكن استهداف ملفات معينة مثل <code>git reset</code></li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git switch</code></h4>
+                                <p>يستخدم للانتقال من فرع لآخر. أمر حديث ومحدد للتبديل بين الفروع.</p>
+                                <ul>
+                                    <li>أكثر وضوحًا من <code>git checkout</code></li>
+                                    <li>مثال: <code>git switch master</code> للعودة للفرع الرئيسي</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git log</code></h4>
+                                <p>يعرض تاريخ الـ commits بخيارات متعددة:</p>
+                                <ul>
+                                    <li><code>git log --oneline</code>: عرض مختصر في سطر واحد</li>
+                                    <li><code>git log --author="Author Name"</code>: فلترة حسب المؤلف</li>
+                                    <li><code>git log --grep="Search Term"</code>: البحث في رسائل الـ commits</li>
+                                    <li><code>git log --graph</code>: عرض بياني للفروع والدمج</li>
+                                    <li>للخروج: اضغط <kbd>q</kbd></li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git init</code></h4>
+                                <p>ينشئ مستودع Git محلي جديد، ويخلق مجلد <code>.git</code>. يستخدم مرة واحدة عند بدء مشروع جديد.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git remote</code></h4>
+                                <p>يعرض معلومات المستودعات البعيدة:</p>
+                                <ul>
+                                    <li><code>git remote add [name] [URL]</code>: إضافة مستودع بعيد</li>
+                                    <li><code>git remote -v</code>: عرض روابط الـ fetch والـ push</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git push</code></h4>
+                                <p>يرسل الـ commits المحلية إلى المستودع البعيد:</p>
+                                <ul>
+                                    <li><code>git push -u origin [branch name]</code>: يربط الفرع المحلي بالبعيد</li>
+                                    <li>بعد الربط، يمكن استخدام <code>git push</code> فقط</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git pull</code></h4>
+                                <p>يسحب التغييرات من المستودع البعيد ويدمجها في الفرع المحلي الحالي.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git clone</code></h4>
+                                <p>ينزل مستودعًا بعيدًا موجودًا إلى جهازك، مع كامل التاريخ والفروع وإعداد الـ remote. لا تحتاج <code>git init</code> أو <code>git remote add</code> بعده.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git fetch</code></h4>
+                                <p>ينزل البيانات من المستودع البعيد لكن لا يدمجها. يحديث فروع التتبع البعيدة فقط، مما يتيح لك رؤية التغييرات دون تطبيقها.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git status</code></h4>
+                                <p>يعرض حالة مجلد العمل ومنطقة التجهيز، بما في ذلك التغييرات المجهزة وغير المجهزة والملفات غير المتتبعة.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git add</code></h4>
+                                <p>يضع التغييرات من مجلد العمل إلى منطقة التجهيز للـ commit التالي.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git commit</code></h4>
+                                <p>يسجل التغييرات المجهزة في المستودع:</p>
+                                <ul>
+                                    <li><code>git commit -m "message"</code>: حفظ مع رسالة وصفية</li>
+                                    <li><code>git commit --amend</code>: تعديل آخر commit</li>
+                                    <li><code>git commit --amend --no-edit</code>: تعديل بدون تغيير الرسالة</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git reset</code></h4>
+                                <p>يلغي التغييرات بنقل مؤشر HEAD لـ commit سابق:</p>
+                                <ul>
+                                    <li><code>--soft</code>: يحتفظ بالتغييرات في منطقة التجهيز</li>
+                                    <li><code>--mixed</code> (افتراضي): ينقل التغييرات لمجلد العمل</li>
+                                    <li><code>--hard</code>: يحذف التغييرات نهائيًا (خطير!)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git revert</code></h4>
+                                <p>ينشئ commit جديد يلغي تغييرات commit محدد. آمن للفروع المشتركة لأنه يحافظ على التاريخ.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git cherry-pick</code></h4>
+                                <p>يطبق تغييرات commit معين من أي فرع على فرعك الحالي:</p>
+                                <ul>
+                                    <li><code>git cherry-pick --no-commit [hash]</code>: يطبق التغييرات دون إنشاء commit</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git stash</code></h4>
+                                <p>يحفظ التغييرات مؤقتًا للتبديل بين المهام:</p>
+                                <ul>
+                                    <li><code>git stash save "message"</code>: حفظ مع رسالة</li>
+                                    <li><code>git stash list</code>: عرض قائمة المحفوظات</li>
+                                    <li><code>git stash apply</code>: تطبيق دون حذف</li>
+                                    <li><code>git stash pop</code>: تطبيق مع حذف</li>
+                                    <li><code>git stash drop</code>: حذف محفوظة معينة</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h4><code>git reflog</code></h4>
+                                <p>يعرض سجل تحديثات HEAD والفروع في المستودع المحلي. مفيد لاسترداد الـ commits المفقودة حتى بعد hard reset.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Quiz & Glossary -->
+        <section id="quiz-section" class="lecture-section bg-light">
+             <div class="container">
+                <h2><i class="fas fa-graduation-cap icon"></i>IV. اختبار ومراجع</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <h3>اختبر معلوماتك</h3>
+                         <div class="accordion" id="quizAccordion">
+                            <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q1">1. ما الفرق بين git fetch و git pull؟</button></h2><div id="q1" class="accordion-collapse collapse" data-bs-parent="#quizAccordion"><div class="accordion-body"><code>git fetch</code> يقوم بتنزيل البيانات الجديدة من الـ remote ولكنه لا يدمجها، بينما <code>git pull</code> يقوم بعمل <code>fetch</code> ثم <code>merge</code> لدمج التغييرات فورًا.</div></div></div>
+                            <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q2">2. متى يُفضل استخدام git revert على git reset؟</button></h2><div id="q2" class="accordion-collapse collapse" data-bs-parent="#quizAccordion"><div class="accordion-body">يُفضل <code>revert</code> في المستودعات المشتركة لأنه ينشئ commit جديدًا للتراجع بدلاً من حذف التاريخ، مما يحافظ على سلامة تاريخ المشروع لجميع المتعاونين.</div></div></div>
+                            <div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q3">3. ما وظيفة git stash؟</button></h2><div id="q3" class="accordion-collapse collapse" data-bs-parent="#quizAccordion"><div class="accordion-body">يستخدم لحفظ التغييرات غير المكتملة بشكل مؤقت للسماح لك بالتبديل بين الفروع، ثم استرجاعها لاحقًا.</div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center p-4 mt-5">
+        <div class="container">
+            <p>&copy; 2025 محاضرة Git والتحكم في الإصدارات. تلخيص وإعداد: أحمد عزام</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('click', function(event) { if (event.target.matches('.copy-btn') || event.target.closest('.copy-btn')) { const button = event.target.closest('.copy-btn'); const container = button.closest('.cmd-container'); const codeBlock = container.querySelector('.cmd-block'); const commandText = codeBlock.innerText.replace('$ ', '').trim(); navigator.clipboard.writeText(commandText).then(() => { const originalContent = button.innerHTML; button.innerHTML = '<i class="fas fa-check"></i> تم النسخ!'; button.classList.add('copied'); setTimeout(() => { button.innerHTML = originalContent; button.classList.remove('copied'); }, 2000); }); } });
+        document.querySelectorAll('a.nav-link').forEach(anchor => { anchor.addEventListener('click', function (e) { e.preventDefault(); document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' }); }); });
+    </script>
+</body>
+</html>
